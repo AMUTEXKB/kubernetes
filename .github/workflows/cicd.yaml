@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
 
+env:
+  EKS_CLUSTER_NAME: my-temporal-app
+  AWS_REGION: us-east-1
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,9 +32,9 @@ jobs:
       - name: Login to Docker
         uses: docker/login-action@v1
         with:
-          registry: docker.io # Replace with your registry URL
-          username: ${{ secrets.DOCKER_USERNAME }} # Set your Docker username as a secret in your repository settings
-          password: ${{ secrets.DOCKER_PASSWORD }} # Set your Docker password as a secret in your repository settings
+          registry: docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
         uses: docker/build-push-action@v2
@@ -40,8 +44,9 @@ jobs:
           tags: docker.io/amutex/my-temporal-app:v1
 
   deploy:
-    runs-on: ubuntu-latest
     needs: build
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -51,7 +56,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Install kubectl
         run: |
@@ -60,7 +65,7 @@ jobs:
           sudo mv ./kubectl /usr/local/bin/kubectl
 
       - name: Update kubectl config
-        run: aws eks update-kubeconfig --name my-temporal-app --region us-east-1
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
       - name: Deploy Kubernetes resources
         run: |

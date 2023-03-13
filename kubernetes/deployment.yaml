@@ -1,19 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-temporal-app
+  name: temporal-worker
+  labels:
+    app: temporal-worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-temporal-app
+      app: temporal-worker
   template:
     metadata:
       labels:
-        app: my-temporal-app
+        app: temporal-worker
     spec:
       containers:
-      - name: my-temporal-app
-        image: amutex/my-temporal-app:v1
-        ports:
-        - containerPort: 8080
+        - name: temporal-worker
+          image: docker.io/amutex/my-temporal-app:v1
+          command: ["./worker"]
+          env:
+            - name: TEMPORAL_NAMESPACE
+              value: "default"
+            - name: TEMPORAL_TASK_QUEUE
+              value: "default"
+          ports:
+            - name: http
+              containerPort: 7933
