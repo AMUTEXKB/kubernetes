@@ -1,5 +1,3 @@
-# .github/workflows/cicd.yml
-
 name: CI
 
 on:
@@ -26,6 +24,13 @@ jobs:
 
       - name: Run tests
         run: go test ./...
+
+      - name: Login to Docker
+        uses: docker/login-action@v1
+        with:
+          registry: <registry> # Replace with your registry URL
+          username: ${{ secrets.DOCKER_USERNAME }} # Set your Docker username as a secret in your repository settings
+          password: ${{ secrets.DOCKER_PASSWORD }} # Set your Docker password as a secret in your repository settings
 
       - name: Build Docker image
         uses: docker/build-push-action@v2
