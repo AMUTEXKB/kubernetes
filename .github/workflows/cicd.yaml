@@ -15,7 +15,7 @@ jobs:
         id: check_cluster
         run: |
           set +e
-          aws eks describe-cluster --name my-temporal-app --region us-east-1 >/dev/null 2>&1
+          aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} >/dev/null 2>&1
           exists=$?
           set -e
           if [ $exists -eq 0 ]; then
@@ -29,7 +29,7 @@ jobs:
       - name: Create EKS cluster
         if: steps.check_cluster.outputs.cluster_exists == 'false'
         run: |
-          aws eks create-cluster --name my-temporal-app --region us-east-1 --kubernetes-version 1.25 --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID}}:role/eksClusterRole --resources-vpc-config '{"subnetIds":["subnet-0e8554fddf40bed60","subnet-046f3384461efc0ed"],"securityGroupIds":["sg-0cafe62a98a8f4ff0"]}'
+          aws eks create-cluster --name ${{ env.EKS_CLUSTER_NAME }}  --region ${{ env.AWS_REGION }} --kubernetes-version 1.25 --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID}}:role/eksClusterRole --resources-vpc-config '{"subnetIds":["subnet-0e8554fddf40bed60","subnet-046f3384461efc0ed"],"securityGroupIds":["sg-0cafe62a98a8f4ff0"]}'
           aws eks wait cluster-active --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
       - name: Update kubectl config
