@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: my-temporal-app
-        image: my-registry/my-temporal-app:v1
+        image: amutex/my-temporal-app:v1
         ports:
         - containerPort: 8080
