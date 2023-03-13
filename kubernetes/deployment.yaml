@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-temporal-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-temporal-app
+  template:
+    metadata:
+      labels:
+        app: my-temporal-app
+    spec:
+      containers:
+      - name: my-temporal-app
+        image: my-registry/my-temporal-app:v1
+        ports:
+        - containerPort: 8080
