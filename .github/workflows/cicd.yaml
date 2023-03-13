@@ -20,7 +20,7 @@ jobs:
 
       - name: Create EKS cluster
         run: |
-          aws eks create-cluster --name my-temporal-app --region us-east-1 --kubernetes-version 1.21 --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID}}:role/eksClusterRole --resources-vpc-config "./vpc-config.json"
+          aws eks create-cluster --name my-temporal-app --region us-east-1 --kubernetes-version 1.21 --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID}}:role/eksClusterRole --resources-vpc-config file://./vpc-config.json
           aws eks wait cluster-active --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
       - name: Update kubectl config
