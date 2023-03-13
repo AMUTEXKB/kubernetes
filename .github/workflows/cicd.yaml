@@ -14,18 +14,14 @@ jobs:
       - name: Check if EKS cluster exists
         id: check_cluster
         run: |
-          set +e
-          aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} 
-          exists=$?
-          set -e
-          if [ $exists -eq 0 ]; then
+          cluster=$(aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} --output json 2>/dev/null)
+          if [[ -n "$cluster" ]]; then
             echo "EKS cluster already exists"
             echo "::set-output name=cluster_exists::true"
           else
             echo "EKS cluster does not exist"
             echo "::set-output name=cluster_exists::false"
           fi
-
       - name: Create EKS cluster
         if: steps.check_cluster.outputs.cluster_exists == 'false'
         run: |
