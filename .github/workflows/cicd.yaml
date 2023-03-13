@@ -1,5 +1,3 @@
-name: CI
-
 on:
   push:
     branches: [main]
@@ -9,7 +7,6 @@ env:
   AWS_REGION: us-east-1
 
 jobs:
-
   create-eks-cluster:
     runs-on: ubuntu-latest
 
@@ -23,16 +20,17 @@ jobs:
 
       - name: Create EKS cluster
         run: |
-          aws eks create-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} --kubernetes-version 1.21
+          aws eks create-cluster --name my-temporal-app --region us-east-1 --kubernetes-version 1.21 --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID}}:role/eksClusterRole --resources-vpc-config ./vpc-config.json
           aws eks wait cluster-active --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
       - name: Update kubectl config
         run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
-      - name: Verify EKS cluster
+      - name: Verify EKS cluster is available
         run: kubectl get nodes
-        
+
   build:
+    needs: create-eks-cluster
     runs-on: ubuntu-latest
 
     steps:

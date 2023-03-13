@@ -1,0 +1,9 @@
+{
+    "subnetIds": [
+        "subnet-0e8554fddf40bed60",
+        "subnet-046f3384461efc0ed"
+    ],
+    "securityGroupIds": [
+        "sg-0cafe62a98a8f4ff0"
+    ]
+}
