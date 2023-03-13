@@ -15,7 +15,7 @@ jobs:
         id: check_cluster
         run: |
           set +e
-          aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} >/dev/null 2>&1
+          aws eks describe-cluster --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }} 
           exists=$?
           set -e
           if [ $exists -eq 0 ]; then
