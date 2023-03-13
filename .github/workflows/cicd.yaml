@@ -11,14 +11,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+      - name: Check if EKS cluster exists
+        id: check_cluster
+        run: |
+          set +e
+          aws eks describe-cluster --name my-temporal-app --region us-east-1 >/dev/null 2>&1
+          exists=$?
+          set -e
+          if [ $exists -eq 0 ]; then
+            echo "EKS cluster already exists"
+            echo "::set-output name=cluster_exists::true"
+          else
+            echo "EKS cluster does not exist"
+            echo "::set-output name=cluster_exists::false"
+          fi
 
       - name: Create EKS cluster
+        if: steps.check_cluster.outputs.cluster_exists == 'false'
         run: |
           aws eks create-cluster --name my-temporal-app --region us-east-1 --kubernetes-version 1.25 --role-arn arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID}}:role/eksClusterRole --resources-vpc-config '{"subnetIds":["subnet-0e8554fddf40bed60","subnet-046f3384461efc0ed"],"securityGroupIds":["sg-0cafe62a98a8f4ff0"]}'
           aws eks wait cluster-active --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
